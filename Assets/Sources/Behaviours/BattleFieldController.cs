@@ -21,15 +21,15 @@ public class BattleFieldController : MonoBehaviour {
 
 	public void Init(GameConfig config) {
 		_config = config;
-		_field.size = new Vector2(config.GameAreaWidth, config.GameAreaHeight);
+		_field.size = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
 		_fieldSize = new Rect(Vector2.zero, _field.size);
 		_camera.orthographicSize = _field.size.y / 2f;
-		_perFractionCount  = _config.NumUnitsToSpawn / _unitColors.Length;
+		_perFractionCount  = _config.numUnitsToSpawn / _unitColors.Length;
 	}
 
 	public void SpawnUnits(Action onComplete) {
 		
-		_units = new Unit[_unitColors.Length,_config.NumUnitsToSpawn];
+		_units = new Unit[_unitColors.Length,_config.numUnitsToSpawn];
 		StartCoroutine(ProcessSpawnUnits(onComplete));
 	}
 
@@ -44,7 +44,7 @@ public class BattleFieldController : MonoBehaviour {
 		for (int colorIdx = 0; colorIdx < _unitColors.Length; colorIdx++) 
 		for (int i = 0; i < _perFractionCount; i++) {
 			_units[colorIdx, i] = SpawnUnit(colorIdx);
-			yield return new WaitForSeconds(_config.UnitSpawnDelay / 1000f);
+			yield return new WaitForSeconds(_config.unitSpawnDelay / 1000f);
 		}
 
 		onComplete();
@@ -52,8 +52,8 @@ public class BattleFieldController : MonoBehaviour {
 
 	private Unit SpawnUnit(int unitColorIndex) {
 		var unit = Instantiate(_unitPrefab, _unitsHolder);
-		var unitSize = Random.Range(_config.MinUnitRadius, _config.MaxUnitRadius);
-		var unitSpeed = Random.Range(_config.MinUnitSpeed, _config.MaxUnitSpeed);
+		var unitSize = Random.Range(_config.minUnitRadius, _config.maxUnitRadius);
+		var unitSpeed = Random.Range(_config.minUnitSpeed, _config.maxUnitSpeed);
 		unit.Init(unitSize, unitSpeed, _fieldSize, unitColorIndex, _unitColors[unitColorIndex]);
 		
 		return unit;

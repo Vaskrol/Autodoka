@@ -4,10 +4,13 @@ using UnityEngine;
 public class RootEntryPoint : MonoBehaviour {
 
     [SerializeField] private BattleFieldController _battleField;
+
+    private SimulationPhysics _physics;
     
     private void Start() {
         var config = LoadConfig();
         
+        _physics = new SimulationPhysics(config);
         _battleField.Init(config);
         _battleField.SpawnUnits(OnUnitsSpawned);
     }
@@ -23,6 +26,7 @@ public class RootEntryPoint : MonoBehaviour {
         Debug.Log("Loading config from " + configPath);
         
         string json = File.ReadAllText(configPath); 
-        return JsonUtility.FromJson<GameConfig>(json);
+        var config = JsonUtility.FromJson<Config>(json);
+        return config.GameConfig;
     }
 }

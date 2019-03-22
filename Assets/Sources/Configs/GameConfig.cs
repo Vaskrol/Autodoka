@@ -2,29 +2,26 @@ using System;
 using UnityEngine.Serialization;
 
 [Serializable]
+public class Config {
+    public GameConfig GameConfig;
+}
+
+[Serializable]
 public class GameConfig {
     
-    [FormerlySerializedAs("gameAreaWidth")] 
-    public float GameAreaWidth;
+    public float gameAreaWidth;
     
-    [FormerlySerializedAs("gameAreaHeight")] 
-    public float GameAreaHeight;
+    public float gameAreaHeight;
     
-    [FormerlySerializedAs("unitSpawnDelay")] 
-    public float UnitSpawnDelay;
+    public float unitSpawnDelay;
     
-    [FormerlySerializedAs("numUnitsToSpawn")] 
-    public int NumUnitsToSpawn;
+    public int numUnitsToSpawn;
     
-    [FormerlySerializedAs("minUnitRadius")] 
-    public float MinUnitRadius;
+    public float minUnitRadius;
     
-    [FormerlySerializedAs("maxUnitRadius")] 
-    public float MaxUnitRadius;
+    public float maxUnitRadius;
     
-    [FormerlySerializedAs("minUnitSpeed")] 
-    public float MinUnitSpeed;
+    public float minUnitSpeed;
     
-    [FormerlySerializedAs("maxUnitSpeed")] 
-    public float MaxUnitSpeed;
+    public float maxUnitSpeed;
 }

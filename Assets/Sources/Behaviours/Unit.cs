@@ -34,6 +34,6 @@ public class Unit : MonoBehaviour {
     private bool ProcessMovement() {
         transform.Translate(Vector3.forward * Time.fixedDeltaTime * _speed);
         
-        
+        return true;
     }
 }
