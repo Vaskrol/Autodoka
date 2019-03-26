@@ -15,7 +15,6 @@ public class BattleFieldController : MonoBehaviour {
 	
 	private GameConfig _config;
 	private Unit[,] _units;
-	private Rect _fieldSize;
 	private int _perFractionCount;
 	private SimulationPhysics _physics;
 	private bool _isSimulating;
@@ -23,7 +22,6 @@ public class BattleFieldController : MonoBehaviour {
 	public void Init(GameConfig config, SimulationPhysics physics) {
 		_config = config;
 		_field.size = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
-		_fieldSize = new Rect(Vector2.zero, _field.size);
 		_camera.orthographicSize = _field.size.y / 2f;
 		_perFractionCount  = _config.numUnitsToSpawn / _unitColors.Length;
 		_physics = physics;
@@ -65,11 +63,11 @@ public class BattleFieldController : MonoBehaviour {
 		var unitSize = Random.Range(_config.minUnitRadius, _config.maxUnitRadius);
 		var unitSpeed = Random.Range(_config.minUnitSpeed, _config.maxUnitSpeed);
 		
-		unit.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+		unit.Init(unitSize, unitSpeed, unitColorIndex, _unitColors[unitColorIndex]);
 		unit.transform.position = new Vector2(
-			(Random.value - 0.5f) * _field.size.x, 
-			(Random.value - 0.5f) * _field.size.y);
-		unit.Init(unitSize, unitSpeed, _fieldSize, unitColorIndex, _unitColors[unitColorIndex]);
+			(Random.value - 0.5f) * (_field.size.x - unit.Size), 
+			(Random.value - 0.5f) * (_field.size.y - unit.Size));
+		
 		_physics.AddUnit(unit);
 		
 		return unit;

@@ -5,19 +5,20 @@ public class Unit : MonoBehaviour {
     [SerializeField] private SpriteRenderer _sprite;
     [SerializeField] private float _speedModifier = 0.1f;
 
-    public float Size { get; private set; }
+    private const float DIE_SIZE = 0.2f;
+
+    public float Size { get { return _size; } }
     public int Fraction { get; private set; }
+
+    private bool _isSimulated;
     
-    private bool _isSimulated { get; set; }
+    private Vector2 _velocity;
+    private float _size;
     
-    private float _speed;
-    private Rect _fieldRect;
-    
-    public void Init(float size, float speed, Rect areaRect, int fraction, Color color) {
-        Size = size;
-        _speed = speed;
+    public void Init(float size, float speed, int fraction, Color color) {
+        SetSize(size);
+        _velocity = Random.insideUnitCircle.normalized * speed;
         Fraction = fraction;
-        _fieldRect = areaRect;
         _sprite.color = color;
     }
 
@@ -25,14 +26,25 @@ public class Unit : MonoBehaviour {
         _isSimulated = true;
     }
 
-    
-    public void OnCollision(Unit nearbyUnit) {
-        if (Fraction == nearbyUnit.Fraction)
-            return;
-        
+    public void Die() {
         gameObject.SetActive(false);
     }
-    
+
+    public void OnCollision(Collision collision) {
+        if (Fraction == collision.Collider.Fraction)
+            return;
+
+        var sizeDelta = collision.Distance / 2f;
+        SetSize(_size - sizeDelta);
+        
+        if (_size < DIE_SIZE)
+            Die();
+    }
+
+    public void OnWallCollision(Vector2 wallDirection) {
+        _velocity = Vector2.Reflect(_velocity, wallDirection);
+    }
+
     private void FixedUpdate() {
         if (!_isSimulated)
             return;
@@ -40,8 +52,12 @@ public class Unit : MonoBehaviour {
         ProcessMovement();
     }
 
-    private bool ProcessMovement() {
-        transform.Translate(Vector2.up * Time.fixedDeltaTime * _speed * _speedModifier);
-        return true;
+    private void ProcessMovement() {
+        transform.Translate(_velocity * Time.fixedDeltaTime * _speedModifier);
+    }
+
+    private void SetSize(float size) {
+        _size = size;
+        _sprite.size = new Vector2(_size, _size);
     }
 }

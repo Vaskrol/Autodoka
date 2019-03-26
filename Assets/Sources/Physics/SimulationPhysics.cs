@@ -31,14 +31,15 @@ public class SimulationPhysics {
         for (int j = 0; j < _chunks.GetLength(1); j++) {
             foreach (var unit in _chunks[i, j].Units) {
                 DetectCollision(unit, i, j);
+                DetectBounds(unit);
             }
         }
     }
-    
+
     public void AddUnit(Unit unit) {
         var unitPosition = unit.transform.position;
-        var chunkX = (int)Mathf.Floor((unitPosition.x + _fieldSize.x / 2f )/ _chunkSize.x);
-        var chunkY = (int)Mathf.Floor((unitPosition.y + _fieldSize.y / 2f )/ _chunkSize.y);
+        var chunkX = (int)Mathf.Floor((unitPosition.x + _fieldSize.x / 2f)/ _chunkSize.x);
+        var chunkY = (int)Mathf.Floor((unitPosition.y + _fieldSize.y / 2f)/ _chunkSize.y);
         _chunks[chunkX, chunkY].AddUnit(unit);
     }
 
@@ -53,10 +54,32 @@ public class SimulationPhysics {
                     continue;
                 
                 var distance = Vector2.Distance(unit.transform.position, nearbyUnit.transform.position);
-                if (distance < unit.Size / 2f + nearbyUnit.Size / 2f)
-                    unit.OnCollision(nearbyUnit);
+                if (distance > unit.Size / 2f + nearbyUnit.Size / 2f) 
+                    continue;
+                
+                var collision = new Collision(distance, nearbyUnit);
+                unit.OnCollision(collision);  
+                    
+                collision = new Collision(distance, unit);
+                nearbyUnit.OnCollision(collision);
             }
         }
-
+    }
+    
+    private void DetectBounds(Unit unit) {
+        Vector2 unitPosition = unit.transform.position;
+        var unitHalfSize = unit.Size / 2f;
+        
+        if (unitPosition.x - unitHalfSize < -_fieldSize.x / 2f)
+            unit.OnWallCollision(Vector2.left);
+        
+        if (unitPosition.x + unitHalfSize > _fieldSize.x / 2f)
+            unit.OnWallCollision(Vector2.right);
+        
+        if (unitPosition.y - unitHalfSize < -_fieldSize.y / 2f)
+            unit.OnWallCollision(Vector2.up);
+        
+        if (unitPosition.y + unitHalfSize > _fieldSize.y / 2f)
+            unit.OnWallCollision(Vector2.down);
     }
 }
