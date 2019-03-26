@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class SimulationPhysics {
 
-    private Chunk[,] _chunks;
+    private readonly Chunk[,] _chunks;
     private float _chunkSizeModifier = 3f;
 
-    private Vector2 _chunkSize;
-    private Vector2 _fieldSize;
+    private readonly Vector2 _chunkSize;
+    private readonly Vector2 _fieldSize;
 
     public SimulationPhysics(GameConfig config) {
         _fieldSize = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
@@ -29,7 +29,11 @@ public class SimulationPhysics {
     public void Update() {
         for (int i = 0; i < _chunks.GetLength(0); i++) 
         for (int j = 0; j < _chunks.GetLength(1); j++) {
-            foreach (var unit in _chunks[i, j].Units) {
+            var chunk = _chunks[i, j];
+            for(int unitNumber = 0; unitNumber < chunk.Units.Count; unitNumber++) {
+                var unit = chunk.Units[unitNumber];
+                if (TryMoveUnitToAnotherChunk(chunk, unit)) 
+                    unitNumber--;
                 DetectCollision(unit, i, j);
                 DetectBounds(unit);
             }
@@ -37,12 +41,27 @@ public class SimulationPhysics {
     }
 
     public void AddUnit(Unit unit) {
+        var chunk = DefineUnitChunk(unit);
+        chunk.AddUnit(unit);
+    }
+
+    private Chunk DefineUnitChunk(Unit unit) {
         var unitPosition = unit.transform.position;
         var chunkX = (int)Mathf.Floor((unitPosition.x + _fieldSize.x / 2f)/ _chunkSize.x);
         var chunkY = (int)Mathf.Floor((unitPosition.y + _fieldSize.y / 2f)/ _chunkSize.y);
-        _chunks[chunkX, chunkY].AddUnit(unit);
+        return _chunks[chunkX, chunkY];
     }
 
+    private bool TryMoveUnitToAnotherChunk(Chunk currentChunk, Unit unit) {
+        var unitChunk = DefineUnitChunk(unit);
+        if (unitChunk == currentChunk)
+            return false;
+        
+        currentChunk.RemoveUnit(unit);
+        unitChunk.AddUnit(unit);
+        return true;
+    }
+    
     private void DetectCollision(Unit unit, int chunkX, int chunkY) {
         for (int i = chunkX - 1; i <= chunkX + 1; i++)
         for (int j = chunkY - 1; j <= chunkY + 1; j++) {
@@ -50,7 +69,7 @@ public class SimulationPhysics {
                 continue;
 
             foreach (var nearbyUnit in _chunks[i, j].Units) {
-                if (nearbyUnit == null)
+                if (nearbyUnit == null || !nearbyUnit.isActiveAndEnabled)
                     continue;
                 
                 var distance = Vector2.Distance(unit.transform.position, nearbyUnit.transform.position);

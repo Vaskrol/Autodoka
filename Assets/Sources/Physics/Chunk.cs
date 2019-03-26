@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 public class Chunk {
     
-    public HashSet<Unit> Units { get; private set; }
+    public List<Unit> Units { get; private set; }
 
     public Chunk() {
-        Units = new HashSet<Unit>();
+        Units = new List<Unit>();
     }
 
     public void AddUnit(Unit unit) {
