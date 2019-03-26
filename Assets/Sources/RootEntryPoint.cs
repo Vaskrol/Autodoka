@@ -5,13 +5,12 @@ public class RootEntryPoint : MonoBehaviour {
 
     [SerializeField] private BattleFieldController _battleField;
 
-    private SimulationPhysics _physics;
     
     private void Start() {
         var config = LoadConfig();
         
-        _physics = new SimulationPhysics(config);
-        _battleField.Init(config);
+        var physics = new SimulationPhysics(config);
+        _battleField.Init(config, physics);
         _battleField.SpawnUnits(OnUnitsSpawned);
     }
 
