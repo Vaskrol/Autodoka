@@ -1,12 +1,13 @@
-
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Unit : MonoBehaviour {
     [SerializeField] private SpriteRenderer _sprite;
     [SerializeField] private float _speedModifier = 0.1f;
 
-    private const float DIE_SIZE = 0.2f;
+    public delegate void UnitEventHandler(Unit unit);
+    public event UnitEventHandler OnDie;
+
+    private const float DEATH_SIZE = 0.2f;
 
     public float Size { get { return _size; } }
     public int Fraction { get; private set; }
@@ -30,6 +31,8 @@ public class Unit : MonoBehaviour {
     public void Die() {
         gameObject.SetActive(false);
         _isSimulated = false;
+        if (OnDie != null)
+            OnDie(this);
     }
 
     public void OnCollision(Collision collision) {
@@ -40,7 +43,7 @@ public class Unit : MonoBehaviour {
         var sizeDelta = (_size + collidedUnit.Size - collision.Distance) / 2f;
         SetSize(_size - sizeDelta);
         
-        if (_size < DIE_SIZE)
+        if (_size < DEATH_SIZE)
             Die();
     }
 

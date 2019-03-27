@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class BattleFieldController : MonoBehaviour {
@@ -16,6 +19,10 @@ public class BattleFieldController : MonoBehaviour {
 	[Header("Debug")] 
 	[SerializeField] private bool _debugMode;
 	
+	public Dictionary<int, int> FractionCounts = new Dictionary<int, int>(); 
+	public Color[] FractionColors { get { return _unitColors; } }
+	public bool IsSimulating { get { return _isSimulating; }}
+
 	private GameConfig _config;
 	private Unit[,] _units;
 	private int _perFractionCount;
@@ -61,19 +68,30 @@ public class BattleFieldController : MonoBehaviour {
 		onComplete();
 	}
 
-	private Unit SpawnUnit(int unitColorIndex) {
+	private Unit SpawnUnit(int fraction) {
 		var unit = Instantiate(_unitPrefab, _unitsHolder);
 		var unitSize = Random.Range(_config.minUnitRadius, _config.maxUnitRadius);
 		var unitSpeed = Random.Range(_config.minUnitSpeed, _config.maxUnitSpeed);
 		
-		unit.Init(unitSize, unitSpeed, unitColorIndex, _unitColors[unitColorIndex]);
+		unit.Init(unitSize, unitSpeed, fraction, _unitColors[fraction]);
 		unit.transform.position = new Vector2(
 			(Random.value - 0.5f) * (_field.size.x - unit.Size), 
 			(Random.value - 0.5f) * (_field.size.y - unit.Size));
+
+		unit.OnDie += OnUnitDie;
+		
+		if (!FractionCounts.ContainsKey(fraction))
+			FractionCounts.Add(fraction, 1);
+		else
+			FractionCounts[fraction]++;
 		
 		_physics.AddUnit(unit);
 		
 		return unit;
+	}
+
+	private void OnUnitDie(Unit unit) {
+		FractionCounts[unit.Fraction]--;
 	}
 
 	private void OnDrawGizmos() {
