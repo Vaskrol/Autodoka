@@ -12,6 +12,9 @@ public class BattleFieldController : MonoBehaviour {
 	[SerializeField] private Unit _unitPrefab;
 	[SerializeField] private Transform _unitsHolder;
 	[SerializeField] private Color[] _unitColors;
+
+	[Header("Debug")] 
+	[SerializeField] private bool _debugMode;
 	
 	private GameConfig _config;
 	private Unit[,] _units;
@@ -35,7 +38,7 @@ public class BattleFieldController : MonoBehaviour {
 	public void StartSimulation() {
 		for (int colorIdx = 0; colorIdx < _unitColors.Length; colorIdx++)
 		for (int i = 0; i < _perFractionCount; i++) {
-			_units[colorIdx, i].Fight();
+			_units[colorIdx, i].StartSimulation();
 		}
 		
 		_isSimulating = true;
@@ -72,8 +75,12 @@ public class BattleFieldController : MonoBehaviour {
 		
 		return unit;
 	}
-	
-	
 
+	private void OnDrawGizmos() {
+		if (!_debugMode)
+			return;
+		
+		_physics.DebugDrawChunks();
+	}
 }
 

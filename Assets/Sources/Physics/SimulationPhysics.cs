@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SimulationPhysics {
@@ -7,8 +10,10 @@ public class SimulationPhysics {
 
     private readonly Vector2 _chunkSize;
     private readonly Vector2 _fieldSize;
+    private Dictionary<Unit, HashSet<Unit>> _unitsCollisions; 
 
     public SimulationPhysics(GameConfig config) {
+        _unitsCollisions = new Dictionary<Unit, HashSet<Unit>>();
         _fieldSize = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
         
         var maxUnitSize = config.maxUnitRadius;
@@ -69,21 +74,57 @@ public class SimulationPhysics {
                 continue;
 
             foreach (var nearbyUnit in _chunks[i, j].Units) {
-                if (nearbyUnit == null || !nearbyUnit.isActiveAndEnabled)
+                if (nearbyUnit == null || nearbyUnit == unit || !nearbyUnit.isActiveAndEnabled)
                     continue;
                 
                 var distance = Vector2.Distance(unit.transform.position, nearbyUnit.transform.position);
-                if (distance > unit.Size / 2f + nearbyUnit.Size / 2f) 
+                if (distance > unit.Size / 2f + nearbyUnit.Size / 2f) {
+                    StopCollidingUnits(unit, nearbyUnit);
                     continue;
-                
-                var collision = new Collision(distance, nearbyUnit);
-                unit.OnCollision(collision);  
-                    
-                collision = new Collision(distance, unit);
-                nearbyUnit.OnCollision(collision);
+                }
+
+                CollideUnits(unit, nearbyUnit, distance);
+                CollideUnits(nearbyUnit, unit, distance);
             }
         }
     }
+
+    private void CollideUnits(Unit unitOne, Unit unitTwo, float distance) {
+        var collision = new Collision(distance, unitTwo);
+        
+        // The unit doesn't have any collisions yet
+        if (!_unitsCollisions.ContainsKey(unitOne)) {
+            _unitsCollisions.Add(unitOne, new HashSet<Unit>(new[] {unitTwo}));
+            unitOne.OnEnterCollision(collision);
+            return;
+        }
+
+        // The unit doesn't have a collision with this particular unit
+        if (!_unitsCollisions[unitOne].Contains(unitTwo)) {
+            _unitsCollisions[unitOne].Add(unitTwo);
+            unitOne.OnEnterCollision(collision);
+            return;
+        }
+
+        // The unit have already collided with this unit
+        unitOne.OnCollision(collision);
+    }
+
+    private void StopCollidingUnits(Unit unit, Unit nearbyUnit) {
+        // Call OnCollisionExit here
+        
+        if (!_unitsCollisions.Any() || !_unitsCollisions.ContainsKey(unit))
+            return;
+
+        if (_unitsCollisions[unit].Contains(nearbyUnit)) {
+            _unitsCollisions[unit].Remove(nearbyUnit);
+        }
+
+        if (!_unitsCollisions[unit].Any()) {
+            _unitsCollisions.Remove(unit);
+        }
+    }
+
     
     private void DetectBounds(Unit unit) {
         Vector2 unitPosition = unit.transform.position;
@@ -100,5 +141,15 @@ public class SimulationPhysics {
         
         if (unitPosition.y + unitHalfSize > _fieldSize.y / 2f)
             unit.OnWallCollision(Vector2.down);
+    }
+
+    // Let it be here for now
+    public void DebugDrawChunks() {
+        var startPoint = new Vector2(-_fieldSize.x / 2f, -_fieldSize.y / 2f) + _chunkSize / 2f;
+        for (int i = 0; i < _chunks.GetLength(0); i++)
+        for (int j = 0; j < _chunks.GetLength(1); j++) {
+            Vector3 cubeCenter = startPoint + new Vector2(i * _chunkSize.x, j * _chunkSize.y);
+            Gizmos.DrawWireCube(cubeCenter, _chunkSize);
+        }
     }
 }

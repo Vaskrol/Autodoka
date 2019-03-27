@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Unit : MonoBehaviour {
@@ -22,25 +23,37 @@ public class Unit : MonoBehaviour {
         _sprite.color = color;
     }
 
-    public void Fight() {
+    public void StartSimulation() {
         _isSimulated = true;
     }
 
     public void Die() {
         gameObject.SetActive(false);
+        _isSimulated = false;
     }
 
     public void OnCollision(Collision collision) {
-        if (Fraction == collision.Collider.Fraction)
+        var collidedUnit = collision.Collider;
+        if (Fraction == collidedUnit.Fraction) 
             return;
-
-        var sizeDelta = collision.Distance / 2f;
+        
+        var sizeDelta = (_size + collidedUnit.Size - collision.Distance) / 2f;
         SetSize(_size - sizeDelta);
         
         if (_size < DIE_SIZE)
             Die();
     }
 
+    public void OnEnterCollision(Collision collision) {
+        var collidedUnit = collision.Collider;
+        if (Fraction != collidedUnit.Fraction) 
+            return;
+        
+        Vector2 collisionNormal = (transform.position - collidedUnit.transform.position).normalized;
+        _velocity = Vector2.Reflect(_velocity, collisionNormal);
+        return;
+    }
+    
     public void OnWallCollision(Vector2 wallDirection) {
         _velocity = Vector2.Reflect(_velocity, wallDirection);
     }
@@ -60,4 +73,6 @@ public class Unit : MonoBehaviour {
         _size = size;
         _sprite.size = new Vector2(_size, _size);
     }
+
+   
 }
