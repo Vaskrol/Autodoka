@@ -15,4 +15,8 @@ public class Chunk {
     public void RemoveUnit(Unit unit) {
         Units.Remove(unit);
     }
+
+    public void Clear() {
+        Units.Clear();
+    }
 }

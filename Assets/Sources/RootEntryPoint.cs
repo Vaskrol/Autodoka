@@ -11,7 +11,7 @@ public class RootEntryPoint : MonoBehaviour {
         
         var physics = new SimulationPhysics(config);
         _battleField.Init(config, physics);
-        _battleField.SpawnUnits(OnUnitsSpawned);
+        _battleField.SpawnRandomUnits(OnUnitsSpawned);
     }
 
     private void OnUnitsSpawned() {

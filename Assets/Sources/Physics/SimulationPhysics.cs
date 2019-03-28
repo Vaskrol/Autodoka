@@ -152,7 +152,13 @@ public class SimulationPhysics {
             unit.transform.position = new Vector2(unitPosition.x, _fieldSize.y / 2f - unitHalfSize);
         }
     }
-
+    
+    public void Reset() {
+        foreach (var chunk in _chunks) {
+            chunk.Clear();
+        }
+    }
+    
     // Let it be here for now
     public void DebugDrawChunks() {
         var startPoint = new Vector2(-_fieldSize.x / 2f, -_fieldSize.y / 2f) + _chunkSize / 2f;
