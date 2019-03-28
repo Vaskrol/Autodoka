@@ -3,11 +3,11 @@
 	{ 
 		"gameAreaWidth": 50,
 		"gameAreaHeight": 50,
-		"unitSpawnDelay": 50,
-		"numUnitsToSpawn": 6,
-		"minUnitRadius": 5,
-		"maxUnitRadius": 5,
-		"minUnitSpeed": 50,
-		"maxUnitSpeed": 50
+		"unitSpawnDelay": 10,
+		"numUnitsToSpawn": 50,
+		"minUnitRadius": 0.5,
+		"maxUnitRadius": 1,
+		"minUnitSpeed": 5,
+		"maxUnitSpeed": 10
 	} 
 } 

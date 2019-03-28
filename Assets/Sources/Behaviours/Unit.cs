@@ -36,6 +36,9 @@ public class Unit : MonoBehaviour {
     }
 
     public void OnCollision(Collision collision) {
+        if (!_isSimulated)
+            return;
+        
         var collidedUnit = collision.Collider;
         if (Fraction == collidedUnit.Fraction) 
             return;
@@ -48,6 +51,9 @@ public class Unit : MonoBehaviour {
     }
 
     public void OnEnterCollision(Collision collision) {
+        if (!_isSimulated)
+            return;
+        
         var collidedUnit = collision.Collider;
         if (Fraction != collidedUnit.Fraction) 
             return;

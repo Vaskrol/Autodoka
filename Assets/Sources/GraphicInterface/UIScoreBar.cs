@@ -10,14 +10,11 @@ public class UIScoreBar : MonoBehaviour {
 	[SerializeField] private BattleFieldController _battleField;
 
 	private List<LayoutElement> _bars = new List<LayoutElement>();
-	private float _totalBarWidth;
-
+	
 	private void Start () {
-		_totalBarWidth = _barBack.rect.width;
-
 		foreach (var fractionColor in _battleField.FractionColors) {
 			var bar = Instantiate(_coloredBar, _barBack);
-			bar.GetComponent<Image>().color = fractionColor;
+			bar.GetComponent<Image>().color = fractionColor.WithAlpha(0.5f);
 			_bars.Add(bar);
 		}
 	}
@@ -26,11 +23,11 @@ public class UIScoreBar : MonoBehaviour {
 		if (!_battleField.IsSimulating)
 			return;
 		
+		var totalBarWidth = Screen.width;
 		var totalUnitsCount = _battleField.FractionCounts.Sum(f => f.Value);
-		Debug.Log("Total units: " + totalUnitsCount);
 		for (int i = 0; i < _bars.Count; i++) {
 			var bar = _bars[i];
-			bar.preferredHeight = _totalBarWidth / totalUnitsCount * _battleField.FractionCounts[i];
+			bar.preferredWidth = totalBarWidth / totalUnitsCount * _battleField.FractionCounts[i];
 		}
 	}
 }
