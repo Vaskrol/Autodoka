@@ -24,7 +24,7 @@ public class UIScoreBar : MonoBehaviour {
 			return;
 		
 		var totalBarWidth = Screen.width;
-		var totalUnitsCount = _battleField.FractionCounts.Sum(f => f.Value);
+		var totalUnitsCount = _battleField.FractionCounts.Sum(f => f);
 		for (int i = 0; i < _bars.Count; i++) {
 			var bar = _bars[i];
 			bar.preferredWidth = totalBarWidth / totalUnitsCount * _battleField.FractionCounts[i];

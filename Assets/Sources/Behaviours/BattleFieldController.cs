@@ -19,7 +19,7 @@ public class BattleFieldController : MonoBehaviour {
 	[Header("Debug")] 
 	[SerializeField] private bool _debugMode;
 	
-	public Dictionary<int, int> FractionCounts = new Dictionary<int, int>(); 
+	public List<int> FractionCounts = new List<int>(); 
 	public Color[] FractionColors { get { return _unitColors; } }
 	public bool IsSimulating { get { return _isSimulating; }}
 
@@ -79,11 +79,9 @@ public class BattleFieldController : MonoBehaviour {
 
 		unit.OnDie += OnUnitDie;
 		
-		if (!FractionCounts.ContainsKey(fraction))
-			FractionCounts.Add(fraction, 1);
-		else
-			FractionCounts[fraction]++;
-		
+		if (FractionCounts.Count <= fraction)
+			FractionCounts.Add(0);
+		FractionCounts[fraction]++;
 		_physics.AddUnit(unit);
 		
 		return unit;
@@ -127,11 +125,9 @@ public class BattleFieldController : MonoBehaviour {
 			unit.transform.position = unitToken.Position;
 
 			unit.OnDie += OnUnitDie;
-
-			if (!FractionCounts.ContainsKey(unitToken.Fraction))
-				FractionCounts.Add(unitToken.Fraction, 1);
-			else
-				FractionCounts[unitToken.Fraction]++;
+			if (FractionCounts.Count <= unitToken.Fraction)
+				FractionCounts.Add(0);
+			FractionCounts[unitToken.Fraction]++;
 
 			_physics.AddUnit(unit);
 			_units[i] = unit;
