@@ -108,6 +108,11 @@ public class BattleFieldController : MonoBehaviour {
 		StartSimulation();
 	}
 
+	public void StartNewSimulation() {
+		ResetField();
+		SpawnRandomUnits(StartSimulation);
+	}
+	
 	private void SpawnLoadedUnits(SaveToken save) {
 		_units = new Unit[save.Units.Count];
 		for (var i = 0; i < save.Units.Count; i++) {

@@ -26,6 +26,6 @@ public class UIControlPanel : MonoBehaviour {
 	}
 
 	private void OnNewSimulationClicked() {
-		//_battleField.StartNewSimulation();
+		_battleField.StartNewSimulation();
 	}
 }
