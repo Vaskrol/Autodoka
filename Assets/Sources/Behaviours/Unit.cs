@@ -61,7 +61,6 @@ public class Unit : MonoBehaviour {
         
         Vector2 collisionNormal = (transform.position - collidedUnit.transform.position).normalized;
         Velocity = Vector2.Reflect(Velocity, collisionNormal);
-        return;
     }
     
     public void OnWallCollision(Vector2 wallDirection) {
