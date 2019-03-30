@@ -25,7 +25,6 @@ public class BattleFieldController : MonoBehaviour {
 
 	private GameConfig _config;
 	private Unit[] _units;
-	private int _perFractionCount;
 	private SimulationPhysics _physics;
 	private bool _isSimulating;
 
@@ -33,7 +32,6 @@ public class BattleFieldController : MonoBehaviour {
 		_config = config;
 		_field.size = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
 		_camera.orthographicSize = _field.size.y / 2f;
-		_perFractionCount  = _config.numUnitsToSpawn / _unitColors.Length;
 		_physics = physics;
 	}
 
@@ -57,9 +55,11 @@ public class BattleFieldController : MonoBehaviour {
 	}
 
 	private IEnumerator ProcessSpawnRandomUnits(Action onComplete) {
-		for (int colorIdx = 0; colorIdx < _unitColors.Length; colorIdx++) 
-		for (int i = 0; i < _perFractionCount; i++) {
-			_units[colorIdx * _perFractionCount + i] = SpawnRandomUnit(colorIdx);
+		var colorIdx = 0; 
+		for (int i = 0; i < _config.numUnitsToSpawn; i++) {
+			_units[i] = SpawnRandomUnit(colorIdx);
+			if (++colorIdx >= _unitColors.Length)
+				colorIdx = 0;
 			yield return new WaitForSeconds(_config.unitSpawnDelay / 1000f);
 		}
 

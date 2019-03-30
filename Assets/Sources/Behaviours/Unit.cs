@@ -42,7 +42,9 @@ public class Unit : MonoBehaviour {
         if (Fraction == collidedUnit.Fraction) 
             return;
         
-        var sizeDelta = (Size + collidedUnit.Size - collision.Distance) / 2f;
+        var sizeDelta = (Size / 2f + collidedUnit.Size / 2f - collision.Distance);
+        if (sizeDelta > collidedUnit.Size / 2)
+            sizeDelta = collidedUnit.Size / 2f;
         SetSize(Size - sizeDelta);
         
         if (Size < DEATH_SIZE)

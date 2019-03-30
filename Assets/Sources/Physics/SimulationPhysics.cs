@@ -53,8 +53,8 @@ public class SimulationPhysics {
 
     private Chunk DefineUnitChunk(Unit unit) {
         var unitPosition = unit.transform.position;
-        var chunkX = (int)((unitPosition.x + _fieldSize.x / 2f) / _chunkSize.x);
-        var chunkY = (int)((unitPosition.y + _fieldSize.y / 2f) / _chunkSize.y);
+        var chunkX = Mathf.FloorToInt((unitPosition.x + _fieldSize.x / 2f) / _chunkSize.x);
+        var chunkY = Mathf.FloorToInt((unitPosition.y + _fieldSize.y / 2f) / _chunkSize.y);
         
         return _chunks[chunkX, chunkY];
     }
@@ -76,9 +76,14 @@ public class SimulationPhysics {
                 continue;
 
             foreach (var nearbyUnit in _chunks[i, j].Units) {
-                if (nearbyUnit == null || nearbyUnit == unit || !nearbyUnit.isActiveAndEnabled)
+                if (nearbyUnit == unit)
                     continue;
                 
+                if (nearbyUnit == null || !nearbyUnit.isActiveAndEnabled) {
+                    StopCollidingUnits(unit, nearbyUnit);
+                    continue;
+                }
+
                 var distance = Vector2.Distance(unit.transform.position, nearbyUnit.transform.position);
                 if (distance > unit.Size / 2f + nearbyUnit.Size / 2f) {
                     StopCollidingUnits(unit, nearbyUnit);
