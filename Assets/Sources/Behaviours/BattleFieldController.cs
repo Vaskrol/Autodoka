@@ -19,9 +19,17 @@ public class BattleFieldController : MonoBehaviour {
 	[Header("Debug")] 
 	[SerializeField] private bool _debugMode;
 	
-	public List<int> FractionCounts = new List<int>(); 
-	public Color[] FractionColors { get { return _unitColors; } }
+	public List<int> FractionCounts = new List<int>();
 	public bool IsSimulating { get { return _isSimulating; }}
+
+	public Color[] FractionColors {
+		get {
+			if (_config.numUnitsToSpawn >= _unitColors.Length)
+				return _unitColors;
+			
+			return _unitColors.Take(_config.numUnitsToSpawn).ToArray();
+		}
+	}
 
 	private GameConfig _config;
 	private Unit[] _units;
