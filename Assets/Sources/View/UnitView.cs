@@ -6,7 +6,7 @@ public class UnitView : MonoBehaviour {
 
     private Unit _unit;
     
-    public void Init(Unit unit, Color color) {
+    public void Setup(Unit unit, Color color) {
         _unit = unit;
         _unit.OnDie += OnUnitDie;
         _unit.OnSizeChanged += OnUnitSizeChanged;
@@ -25,11 +25,9 @@ public class UnitView : MonoBehaviour {
     }
 
     private void OnUnitDie(Unit unit) {
-        gameObject.SetActive(false);
-    }
-
-    private void OnDestroy() {
         _unit.OnDie -= OnUnitDie;
         _unit.OnSizeChanged -= OnUnitSizeChanged;
+        
+        gameObject.SetActive(false);
     }
 }

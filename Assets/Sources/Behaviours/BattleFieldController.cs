@@ -20,7 +20,11 @@ public class BattleFieldController : MonoBehaviour {
 	
 	public List<int> FractionCounts = new List<int>();
 	public bool IsSimulating { get { return _isSimulating; }}
+	
+	private List<UnitView> _views;
+	private Stack<UnitView> _viewPool;
 
+	
 	public Color[] FractionColors {
 		get {
 			if (_config.numUnitsToSpawn >= _unitColors.Length)
@@ -40,6 +44,9 @@ public class BattleFieldController : MonoBehaviour {
 		_field.size = new Vector2(config.gameAreaWidth, config.gameAreaHeight);
 		_camera.orthographicSize = _field.size.y / 2f;
 		_physics = physics;
+		
+		_views = new List<UnitView>(config.numUnitsToSpawn);
+		_viewPool = new Stack<UnitView>(config.numUnitsToSpawn);
 	}
 
 	public void SpawnRandomUnits(Action onComplete) {
@@ -99,8 +106,16 @@ public class BattleFieldController : MonoBehaviour {
 	}
 
 	private void CreateUnitView(Unit unit) {
-		var unitView = Instantiate(_unitViewPrefab, _unitsHolder);
-		unitView.Init(unit, _unitColors[unit.Fraction]);
+		UnitView unitView;
+		if (_viewPool.Any()) {
+			unitView = _viewPool.Pop();
+			unitView.gameObject.SetActive(true);
+		} else {
+			unitView = Instantiate(_unitViewPrefab, _unitsHolder);	
+		}
+			
+		unitView.Setup(unit, _unitColors[unit.Fraction]);
+		_views.Add(unitView);
 	}
 
 	private void OnUnitDie(Unit unit) {
@@ -170,6 +185,13 @@ public class BattleFieldController : MonoBehaviour {
 		
 		FractionCounts.Clear();
 		_physics.Reset();
+		
+		foreach (var view in _views) {
+			view.gameObject.SetActive(false);
+			_viewPool.Push(view);
+		}
+		
+		_views.Clear();
 	}
 
 	private void OnDrawGizmos() {
