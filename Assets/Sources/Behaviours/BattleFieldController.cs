@@ -11,7 +11,7 @@ public class BattleFieldController : MonoBehaviour {
 	[SerializeField] private Camera _camera;
 	
 	[Header("Units")]
-	[SerializeField] private Unit _unitPrefab;
+	[SerializeField] private UnitView _unitViewPrefab;
 	[SerializeField] private Transform _unitsHolder;
 	[SerializeField] private Color[] _unitColors;
 
@@ -58,6 +58,9 @@ public class BattleFieldController : MonoBehaviour {
 		if (!_isSimulating)
 			return;
 		
+		foreach (var unit in _units) 
+			unit.Update();
+		
 		_physics.Update();
 	}
 
@@ -74,15 +77,16 @@ public class BattleFieldController : MonoBehaviour {
 	}
 
 	private Unit SpawnRandomUnit(int fraction) {
-		var unit = Instantiate(_unitPrefab, _unitsHolder);
 		var unitSize = Random.Range(_config.minUnitRadius, _config.maxUnitRadius);
 		var unitSpeed = Random.Range(_config.minUnitSpeed, _config.maxUnitSpeed);
 		var unitVelocity = Random.insideUnitCircle.normalized * unitSpeed;
+		var unitPosition = new Vector2(
+			(Random.value - 0.5f) * (_field.size.x - unitSize), 
+			(Random.value - 0.5f) * (_field.size.y - unitSize)); 
 		
-		unit.Init(unitSize, unitVelocity, fraction, _unitColors[fraction]);
-		unit.transform.position = new Vector2(
-			(Random.value - 0.5f) * (_field.size.x - unit.Size), 
-			(Random.value - 0.5f) * (_field.size.y - unit.Size));
+		var unit = new Unit(unitPosition, unitSize, unitVelocity, fraction);
+		
+		CreateUnitView(unit);
 
 		unit.OnDie += OnUnitDie;
 		
@@ -94,13 +98,18 @@ public class BattleFieldController : MonoBehaviour {
 		return unit;
 	}
 
+	private void CreateUnitView(Unit unit) {
+		var unitView = Instantiate(_unitViewPrefab, _unitsHolder);
+		unitView.Init(unit, _unitColors[unit.Fraction]);
+	}
+
 	private void OnUnitDie(Unit unit) {
 		FractionCounts[unit.Fraction]--;
 		unit.OnDie -= OnUnitDie;
 	}
 	
 	public void Save() {
-		SaveManager.SaveSimulation(_units, _field.size);
+		SaveManager.SaveSimulation(_units);
 	}
 
 	public void Load() {
@@ -122,16 +131,16 @@ public class BattleFieldController : MonoBehaviour {
 		_units = new Unit[save.Units.Count];
 		for (var i = 0; i < save.Units.Count; i++) {
 			var unitToken = save.Units[i];
-			var unit = Instantiate(_unitPrefab, _unitsHolder);
-
-			unit.Init(
+			var unit = new Unit(
+				unitToken.Position,
 				unitToken.Size,
 				unitToken.Velocity,
-				unitToken.Fraction,
-				_unitColors[unitToken.Fraction]);
-			unit.transform.position = unitToken.Position;
+				unitToken.Fraction);
 
+			CreateUnitView(unit);
+			
 			unit.OnDie += OnUnitDie;
+			
 			if (FractionCounts.Count <= unitToken.Fraction)
 				FractionCounts.Add(0);
 			FractionCounts[unitToken.Fraction]++;
@@ -144,14 +153,15 @@ public class BattleFieldController : MonoBehaviour {
 	private void ResetField() {
 		_isSimulating = false;
 		
-		FractionCounts.Clear();
-		_physics.Reset();
 		foreach (var unit in _units) {
 			if (unit == null)
 				continue;
 			
-			Destroy(unit.gameObject);
+			unit.Die();
 		}
+		
+		FractionCounts.Clear();
+		_physics.Reset();
 	}
 
 	private void OnDrawGizmos() {
@@ -159,6 +169,13 @@ public class BattleFieldController : MonoBehaviour {
 			return;
 		
 		_physics.DebugDrawChunks();
+
+		foreach (var unit in _units) {
+			if (unit == null || !unit.IsSimulated)
+				continue;
+			
+			Gizmos.DrawSphere(unit.Position, unit.Size / 2f);
+		}
 	}
 
 }

@@ -1517,7 +1517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _field: {fileID: 1608319821}
   _camera: {fileID: 1215821946}
-  _unitPrefab: {fileID: 114608826169983184, guid: a95f19f72cd60d54f8cb8405ff54b8c0,
+  _unitViewPrefab: {fileID: 114370884204765352, guid: a95f19f72cd60d54f8cb8405ff54b8c0,
     type: 2}
   _unitsHolder: {fileID: 1879506000}
   _unitColors:

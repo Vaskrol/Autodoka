@@ -52,9 +52,8 @@ public class SimulationPhysics {
     }
 
     private Chunk DefineUnitChunk(Unit unit) {
-        var unitPosition = unit.transform.position;
-        var chunkX = Mathf.FloorToInt((unitPosition.x + _fieldSize.x / 2f) / _chunkSize.x);
-        var chunkY = Mathf.FloorToInt((unitPosition.y + _fieldSize.y / 2f) / _chunkSize.y);
+        var chunkX = Mathf.FloorToInt((unit.Position.x + _fieldSize.x / 2f) / _chunkSize.x);
+        var chunkY = Mathf.FloorToInt((unit.Position.y + _fieldSize.y / 2f) / _chunkSize.y);
         
         return _chunks[chunkX, chunkY];
     }
@@ -79,12 +78,12 @@ public class SimulationPhysics {
                 if (nearbyUnit == unit)
                     continue;
                 
-                if (nearbyUnit == null || !nearbyUnit.isActiveAndEnabled) {
+                if (nearbyUnit == null || !nearbyUnit.IsSimulated) {
                     StopCollidingUnits(unit, nearbyUnit);
                     continue;
                 }
 
-                var distance = Vector2.Distance(unit.transform.position, nearbyUnit.transform.position);
+                var distance = Vector2.Distance(unit.Position, nearbyUnit.Position);
                 if (distance > unit.Size / 2f + nearbyUnit.Size / 2f) {
                     StopCollidingUnits(unit, nearbyUnit);
                     continue;
@@ -134,27 +133,27 @@ public class SimulationPhysics {
 
     
     private void DetectBounds(Unit unit) {
-        Vector2 unitPosition = unit.transform.position;
+        Vector2 unitPosition = unit.Position;
         var unitHalfSize = unit.Size / 2f;
 
         if (unitPosition.x - unitHalfSize < -_fieldSize.x / 2f) {
             unit.OnWallCollision(Vector2.left);
-            unit.transform.position = new Vector2(unitHalfSize -_fieldSize.x / 2f, unitPosition.y);
+            unit.Position = new Vector2(unitHalfSize -_fieldSize.x / 2f, unitPosition.y);
         }
 
         if (unitPosition.x + unitHalfSize > _fieldSize.x / 2f) {
             unit.OnWallCollision(Vector2.right);
-            unit.transform.position = new Vector2(_fieldSize.x / 2f - unitHalfSize, unitPosition.y);
+            unit.Position = new Vector2(_fieldSize.x / 2f - unitHalfSize, unitPosition.y);
         }
 
         if (unitPosition.y - unitHalfSize < -_fieldSize.y / 2f) {
             unit.OnWallCollision(Vector2.up);
-            unit.transform.position = new Vector2(unitPosition.x, unitHalfSize - _fieldSize.y / 2f);
+            unit.Position = new Vector2(unitPosition.x, unitHalfSize - _fieldSize.y / 2f);
         }
 
         if (unitPosition.y + unitHalfSize > _fieldSize.y / 2f) {
             unit.OnWallCollision(Vector2.down);
-            unit.transform.position = new Vector2(unitPosition.x, _fieldSize.y / 2f - unitHalfSize);
+            unit.Position = new Vector2(unitPosition.x, _fieldSize.y / 2f - unitHalfSize);
         }
     }
     

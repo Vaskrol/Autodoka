@@ -5,7 +5,7 @@ public static class SaveManager {
 
     private const string SAVE_KEY = "Autodoka_field";
     
-    public static void SaveSimulation(Unit[] units, Vector2 fieldSize) {
+    public static void SaveSimulation(Unit[] units) {
         var saveToken = new SaveToken {
             Units = new List<UnitToken>(units.Length)
         };
@@ -16,7 +16,7 @@ public static class SaveManager {
             
             saveToken.Units.Add(new UnitToken {
                 Fraction = unit.Fraction,
-                Position = unit.transform.position,
+                Position = unit.Position,
                 Size = unit.Size,
                 Velocity = unit.Velocity
             });
