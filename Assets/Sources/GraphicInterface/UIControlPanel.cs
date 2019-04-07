@@ -7,6 +7,9 @@ public class UIControlPanel : MonoBehaviour {
 	[SerializeField] private Button _newSimulationButton;
 	[SerializeField] private Button _saveButton;
 	[SerializeField] private Button _loadButton;
+	
+	[SerializeField] private Slider _precisionSlider;
+	[SerializeField] private Text _precisionValueText;
 
 	[SerializeField] private GameObject _gameOverPanel;	
 	[SerializeField] private Button _gameOverRestartButton;
@@ -21,6 +24,8 @@ public class UIControlPanel : MonoBehaviour {
 		_saveButton.onClick.AddListener(OnSaveClicked);
 		_loadButton.onClick.AddListener(OnLoadClicked);
 		_gameOverRestartButton.onClick.AddListener(OnNewSimulationClicked);
+		_precisionSlider.onValueChanged.AddListener(OnPrecisionSliderMoved);
+		SetPrecisionText(_precisionSlider.value);
 		
 		_gameOverPanel.SetActive(false);
 	}
@@ -36,6 +41,15 @@ public class UIControlPanel : MonoBehaviour {
 	private void OnNewSimulationClicked() {
 		_battleField.StartNewSimulation();
 		_gameOverPanel.SetActive(false);
+	}
+	
+	private void OnPrecisionSliderMoved(float value) {
+		SetPrecisionText(value);
+		_battleField.SetSimulationStep(value);
+	}
+
+	private void SetPrecisionText(float value) {
+		_precisionValueText.text = "Step: " + value.ToString("0.000") + " sec.";
 	}
 
 	private void Update() {

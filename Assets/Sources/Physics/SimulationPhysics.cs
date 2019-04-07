@@ -55,6 +55,10 @@ public class SimulationPhysics {
         var chunkX = Mathf.FloorToInt((unit.Position.x + _fieldSize.x / 2f) / _chunkSize.x);
         var chunkY = Mathf.FloorToInt((unit.Position.y + _fieldSize.y / 2f) / _chunkSize.y);
         
+        // A chunk number might be calculated incorrectly due to low simulation precision
+        chunkX = Mathf.Clamp(chunkX, 0, _horizontalChunksCount - 1);
+        chunkY = Mathf.Clamp(chunkY, 0, _horizontalChunksCount - 1);
+        
         return _chunks[chunkX, chunkY];
     }
 

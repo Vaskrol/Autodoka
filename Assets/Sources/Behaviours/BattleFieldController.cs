@@ -150,6 +150,10 @@ public class BattleFieldController : MonoBehaviour {
 		}
 	}
 
+	public void SetSimulationStep(float stepDuration) {
+		Time.fixedDeltaTime = stepDuration;
+	}
+
 	private void ResetField() {
 		_isSimulating = false;
 		
