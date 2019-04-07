@@ -152,6 +152,10 @@ public class BattleFieldController : MonoBehaviour {
 
 	public void SetSimulationStep(float stepDuration) {
 		Time.fixedDeltaTime = stepDuration;
+	}	
+	
+	public void SetSimulationSpeed(float timeScale) {
+		Time.timeScale = timeScale;
 	}
 
 	private void ResetField() {
@@ -175,9 +179,14 @@ public class BattleFieldController : MonoBehaviour {
 		_physics.DebugDrawChunks();
 
 		foreach (var unit in _units) {
-			if (unit == null || !unit.IsSimulated)
+			if (unit == null) 
 				continue;
 			
+			if (!unit.IsSimulated) {
+				Gizmos.DrawCube(unit.Position, Vector3.one);
+				continue;
+			}
+
 			Gizmos.DrawSphere(unit.Position, unit.Size / 2f);
 		}
 	}

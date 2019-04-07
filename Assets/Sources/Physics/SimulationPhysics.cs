@@ -38,9 +38,13 @@ public class SimulationPhysics {
             var chunk = _chunks[i, j];
             for(int unitNumber = 0; unitNumber < chunk.Units.Count; unitNumber++) {
                 var unit = chunk.Units[unitNumber];
+                if (!unit.IsSimulated)
+                    continue;
+                
                 DetectBounds(unit);
                 if (TryMoveUnitToAnotherChunk(chunk, unit)) 
                     unitNumber--;
+                
                 DetectCollision(unit, i, j);
             }
         }
@@ -49,6 +53,8 @@ public class SimulationPhysics {
     public void AddUnit(Unit unit) {
         var chunk = DefineUnitChunk(unit);
         chunk.AddUnit(unit);
+        
+        _unitsCollisions.Add(unit, new HashSet<Unit>());
     }
 
     private Chunk DefineUnitChunk(Unit unit) {
@@ -102,13 +108,6 @@ public class SimulationPhysics {
     private void CollideUnits(Unit unitOne, Unit unitTwo, float distance) {
         var collision = new Collision(distance, unitTwo);
         
-        // The unit doesn't have any collisions yet
-        if (!_unitsCollisions.ContainsKey(unitOne)) {
-            _unitsCollisions.Add(unitOne, new HashSet<Unit>(new[] {unitTwo}));
-            unitOne.OnEnterCollision(collision);
-            return;
-        }
-
         // The unit doesn't have a collision with this particular unit
         if (!_unitsCollisions[unitOne].Contains(unitTwo)) {
             _unitsCollisions[unitOne].Add(unitTwo);
@@ -128,10 +127,6 @@ public class SimulationPhysics {
 
         if (_unitsCollisions[unit].Contains(nearbyUnit)) {
             _unitsCollisions[unit].Remove(nearbyUnit);
-        }
-
-        if (!_unitsCollisions[unit].Any()) {
-            _unitsCollisions.Remove(unit);
         }
     }
 
